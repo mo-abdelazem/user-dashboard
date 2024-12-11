@@ -1,0 +1,33 @@
+<div class="user-dashboard container">
+  @if (isLoading) {
+  <div class="loading">
+    <mat-progress-bar mode="buffer"></mat-progress-bar>
+  </div>
+  } @else { @for (user of users; track $index) {
+  <RouterLink
+    [routerLink]="['/dashboard/users', user.id]"
+    routerLinkActive="active"
+  >
+    <div class="user d-flex">
+      <div class="avatar">
+        <img [src]="user.avatar" alt="User Avatar" />
+      </div>
+      <div class="row">
+        <div class="name">{{ user.first_name }} {{ user.last_name }}</div>
+        <div class="email">{{ user.email }}</div>
+      </div>
+    </div>
+  </RouterLink>
+  }
+  <div class="pagination-container">
+    <mat-paginator
+      [length]="totalUsers"
+      [pageSize]="6"
+      (page)="onPageChange($event)"
+      aria-label="Select page"
+      class="pagination"
+    >
+    </mat-paginator>
+  </div>
+  }
+</div>

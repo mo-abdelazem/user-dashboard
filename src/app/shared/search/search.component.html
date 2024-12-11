@@ -1,0 +1,32 @@
+<div class="search-container">
+  <input
+    #searchInput
+    type="text"
+    [(ngModel)]="searchQuery"
+    (ngModelChange)="onSearchTermChange()"
+    placeholder="Search by ID"
+    class="search-input"
+  />
+  @if (loading) {
+  <div class="loading-message">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="30"
+      strokeWidth="4"
+    ></mat-progress-spinner>
+  </div>
+  } @if (!loading && searchResults.length > 0) {
+  <div class="search-results">
+    <ul>
+      @for (user of searchResults; track $index) {
+      <li class="search-item" (click)="onUserSelect(user.id)">
+        <img [src]="user.avatar" alt="Avatar" />
+        <span>{{ user.first_name }} {{ user.last_name }}</span>
+      </li>
+      }
+    </ul>
+  </div>
+  } @if (!loading && noResults) {
+  <div class="search-no-results">No results found.</div>
+  }
+</div>

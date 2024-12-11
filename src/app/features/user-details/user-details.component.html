@@ -1,0 +1,20 @@
+<div class="container">
+  @if (!isLoading) {
+  <div class="user d-flex">
+    <div class="avatar">
+      <img [src]="user.avatar" alt="User Avatar" />
+    </div>
+    <div class="row">
+      <div class="name">
+        {{ user.first_name }} {{ user.last_name }} <span> #{{ user.id }}</span>
+      </div>
+      <div class="email">{{ user.email }}</div>
+    </div>
+  </div>
+  } @else {
+  <div class="loading-user">
+    <mat-progress-bar mode="buffer"></mat-progress-bar>
+  </div>
+  }
+  <button mat-stroked-button color="primary" (click)="goBack()">Go Back</button>
+</div>

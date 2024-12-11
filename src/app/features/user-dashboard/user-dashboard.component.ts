@@ -5,12 +5,14 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { RouterLink } from '@angular/router';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { UserService } from '../../core/services/user-service/user.service';
+import { fadeInAnimation } from '../../animations/animations';
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
   imports: [CommonModule, MatPaginatorModule, MatProgressBar, RouterLink],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css',
+  animations: [fadeInAnimation],
 })
 export class UserDashboardComponent implements OnInit {
   isLoading: boolean = false;
@@ -24,7 +26,6 @@ export class UserDashboardComponent implements OnInit {
   }
   loadUsers(page: number): void {
     this.userService.fetchUsers(page).subscribe((data) => {
-      console.log('Fetched data:', data);
       this.users = data.data;
       this.totalUsers = data.total;
     });

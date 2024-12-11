@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { UserService } from '../../core/services/user-service/user.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subject } from 'rxjs';
+import { Subject, EMPTY } from 'rxjs';
 import { catchError, debounceTime, switchMap, tap } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -35,43 +35,33 @@ export class SearchComponent {
       .pipe(
         debounceTime(300),
         tap(() => {
-          if (this.searchQuery.trim().length > 0) {
-            this.loading = true;
-            this.noResults = false;
-          } else {
-            this.loading = false;
-            this.searchResults = [];
-            this.noResults = false;
-          }
+          this.loading = true;
+          this.noResults = false;
         }),
         switchMap((query) => {
           if (query.trim().length === 0) {
-            return [];
-          }
-          return this.userService.searchUserById(query);
-        }),
-        catchError(() => {
-          this.loading = false;
-          this.searchResults = [];
-          this.noResults = true;
-          return [];
-        }),
-        tap({
-          next: (response) => {
-            this.loading = false;
-            if (response?.data) {
-              this.searchResults = [response.data];
-              this.noResults = false;
-            } else {
-              this.searchResults = [];
-              this.noResults = true;
-            }
-          },
-          error: () => {
             this.loading = false;
             this.searchResults = [];
+            this.noResults = false;
+            return EMPTY;
+          }
+          return this.userService.searchUserById(query).pipe(
+            catchError(() => {
+              this.loading = false;
+              this.noResults = true;
+              return EMPTY;
+            })
+          );
+        }),
+        tap((response) => {
+          this.loading = false;
+          if (response?.data) {
+            this.searchResults = [response.data];
+            this.noResults = false;
+          } else {
+            this.searchResults = [];
             this.noResults = true;
-          },
+          }
         })
       )
       .subscribe();
@@ -90,8 +80,8 @@ export class SearchComponent {
     this.userSelected.emit(userId);
     this.searchQuery = '';
     this.searchResults = [];
-    this.loading = false;
     this.noResults = false;
+    this.loading = false;
     this.searchSubject.next('');
   }
 }

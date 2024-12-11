@@ -8,12 +8,7 @@ import {
 import { UserService } from '../../core/services/user-service/user.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  tap,
-} from 'rxjs/operators';
+import { catchError, debounceTime, switchMap, tap } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -28,7 +23,7 @@ export class SearchComponent {
   loading: boolean = false;
   searchQuery: string = '';
   searchResults: any[] = [];
-  noResults: boolean = false; // Track if there are no results
+  noResults: boolean = false;
   private searchSubject = new Subject<string>();
 
   @ViewChild('searchInput', { static: true }) searchInput!: ElementRef;
@@ -39,11 +34,10 @@ export class SearchComponent {
     this.searchSubject
       .pipe(
         debounceTime(300),
-        distinctUntilChanged(),
         tap(() => {
           if (this.searchQuery.trim().length > 0) {
             this.loading = true;
-            this.noResults = false; // Reset no-results state
+            this.noResults = false;
           } else {
             this.loading = false;
             this.searchResults = [];
@@ -56,6 +50,12 @@ export class SearchComponent {
           }
           return this.userService.searchUserById(query);
         }),
+        catchError(() => {
+          this.loading = false;
+          this.searchResults = [];
+          this.noResults = true;
+          return [];
+        }),
         tap({
           next: (response) => {
             this.loading = false;
@@ -64,7 +64,7 @@ export class SearchComponent {
               this.noResults = false;
             } else {
               this.searchResults = [];
-              this.noResults = true; // Only set this if no results
+              this.noResults = true;
             }
           },
           error: () => {

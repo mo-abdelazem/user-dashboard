@@ -20,19 +20,18 @@ export class UserDashboardComponent implements OnInit {
   constructor(private http: HttpClient, private userService: UserService) {}
 
   ngOnInit() {
-    this.fetchUsers(1);
+    this.loadUsers(1);
   }
-  fetchUsers(page: number) {
-    this.http
-      .get<any>(`https://reqres.in/api/users?page=${page}`)
-      .subscribe((data) => {
-        this.users = data.data;
-        this.totalUsers = data.total;
-      });
+  loadUsers(page: number): void {
+    this.userService.fetchUsers(page).subscribe((data) => {
+      console.log('Fetched data:', data);
+      this.users = data.data;
+      this.totalUsers = data.total;
+    });
   }
 
   onPageChange(event: any) {
     const page = event.pageIndex + 1;
-    this.fetchUsers(page);
+    this.loadUsers(page);
   }
 }

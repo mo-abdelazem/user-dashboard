@@ -2,58 +2,69 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.4.
 
-## Development server
+## Overview
+The **SearchComponent** is a standalone Angular component designed to search for users by ID. It provides real-time search functionality, handles loading and error states, and supports efficient caching to avoid redundant API calls.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## Features
+- **View a paginated list of users**: Users are retrieved from an API and displayed in a paginated format.
+- **Search for users by ID**: A search bar allows users to search for specific users by their ID.
+- **View user details**: Clicking on a user from the list or search results navigates to a detailed user profile page.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Project Structure
+The project is structured as follows:
+- src/app - Contains the core application logic.
+- core - Contains services used throughout the application.
+- services - Contains the UserService for fetching user data.
+- features - Contains feature-specific components.
+- user-dashboard - Contains the UserDashboardComponent for displaying the user list and pagination.
+- user-details - Contains the UserDetailsComponent for displaying a user's details.
+- shared - Contains reusable components used across the application.
+- header - Contains the HeaderComponent for displaying the application header and search bar.
+- search - Contains the SearchComponent for handling user search functionality.
+- angular.json - Configuration file for the Angular CLI.
 
-## Code scaffolding
+## Dependencies
+- This project uses the following dependencies:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Angular CLI
+- HttpClient
+- Angular Material (optional for UI components)
+- Running the application
+- Clone this repository.
+- Install dependencies: npm install
+- Start the development server: ng serve
+- Access the application in your browser at http://localhost:4200/
 
-```bash
-ng generate component component-name
-```
+## UserService
+- The UserService is responsible for fetching user data from the reqres.in API. It utilizes caching mechanisms to improve performance:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- searchUserById: Searches for a user by ID. It checks the cache first before making an API call.
+- getUser: Retrieves details of a specific user by ID. Similar to searchUserById, it utilizes caching.
+- fetchUsers: Fetches a paginated list of users. Caches the retrieved data for faster subsequent requests.
 
-```bash
-ng generate --help
-```
+## UserDashboardComponent
+- The UserDashboardComponent displays the list of users and pagination controls.
 
-## Building
+- It retrieves the initial set of users on initialization using fetchUsers from UserService.
+- It handles pagination events and reloads user data based on the selected page.
 
-To build the project run:
+## UserDetailsComponent
+- The UserDetailsComponent displays the details of a specific user.
 
-```bash
-ng build
-```
+- It retrieves user details based on the ID received through the route parameters.
+- It utilizes caching within UserService for improved performance.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## HeaderComponent
+- The HeaderComponent displays the application header and includes the SearchComponent.
 
-## Running unit tests
+- It facilitates navigation to a user's details page.
+- 
+## SearchComponent
+- The SearchComponent handles user search functionality.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- It utilizes a Subject to debounce search queries and improve performance.
+- It displays a loading indicator and search results based on user input.
+- Clicking on a search result emits a user ID which can be used for navigation.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

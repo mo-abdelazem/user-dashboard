@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { UserService } from '../../core/services/user-service/user.service';
 import { bounceAnimation } from '../../animations/animations';
-import { switchMap } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-user-details',
@@ -17,7 +17,8 @@ import { switchMap } from 'rxjs';
   styleUrls: ['./user-details.component.css'],
   animations: [bounceAnimation],
 })
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsComponent implements OnInit, OnDestroy {
+  private userSubscription: Subscription[] = [];
   user: any;
   userId: number | null = null;
 
@@ -30,24 +31,37 @@ export class UserDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap
-      .pipe(
-        switchMap((params) => {
-          this.userId = +params.get('id')!;
-          return this.userService.getUser(this.userId!);
+    this.userSubscription.push(
+      this.activatedRoute.paramMap
+        .pipe(
+          switchMap((params) => {
+            this.userId = +params.get('id')!;
+            return this.userService.getUser(this.userId!);
+          })
+        )
+        .subscribe((userData) => {
+          this.user = userData.data;
         })
-      )
-      .subscribe((userData) => {
-        this.user = userData.data;
-      });
+    );
+  }
+  ngOnDestroy(): void {
+    this.userSubscription.forEach((sub) => sub.unsubscribe());
   }
 
   fetchUserDetails(userId: string): void {
     this.isLoading = true;
-    this.userService.getUser(+userId).subscribe((data) => {
-      this.user = data.data;
-      this.isLoading = false;
-    });
+    this.userSubscription.push(
+      this.userService.getUser(+userId).subscribe({
+        next: (data) => {
+          this.user = data.data;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error(error);
+          this.isLoading = false;
+        },
+      })
+    );
   }
 
   goBack() {
